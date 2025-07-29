@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import bookRoutes from "./handlers/book";
+import bookRoutes from "./handlers/books";
 
 const app = express();
 const PORT = 3000;
