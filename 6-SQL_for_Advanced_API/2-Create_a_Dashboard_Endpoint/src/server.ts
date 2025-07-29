@@ -1,0 +1,19 @@
+import express, { Request, Response } from "express";
+import bookRoutes from "./handlers/books";
+import orderRoutes from "./handlers/orders";
+
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World!");
+});
+
+bookRoutes(app);
+orderRoutes(app);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
