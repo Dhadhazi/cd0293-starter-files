@@ -38,6 +38,15 @@ describe("Book Model", () => {
   });
 
   it("index method should return a list of books", async () => {
+    // First create a book to ensure we have data to return
+    await store.create({
+      id: 1,
+      title: "Test Book for Index",
+      totalPages: 150,
+      author: "Test Author",
+      summary: "Test Summary",
+    });
+
     const result = await store.index();
     expect(result.length).toBeGreaterThan(0);
     expect(result[0].title).toBeDefined();

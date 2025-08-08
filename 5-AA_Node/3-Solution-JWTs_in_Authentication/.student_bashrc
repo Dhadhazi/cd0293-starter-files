@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# --- Postgres connection info ---
+PGHOST=localhost
+PGPORT=5432
+PGUSER=postgres
+PGPASSWORD="postgres"   # must match your container's POSTGRES_PASSWORD
+export PGHOST PGPORT PGUSER PGPASSWORD
+
+# --- Wait for Postgres to be ready ---
+while ! pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" >/dev/null 2>&1; do
+  echo "Waiting for Postgres..."
+  sleep 1
+done
+
+# --- Ensure magical_user exists ---
+if [ "$(psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='magical_user'")" != "1" ]; then
+  psql -c "CREATE ROLE magical_user LOGIN PASSWORD 'password123'"
+  echo "Created role magical_user"
+else
+  psql -c "ALTER ROLE magical_user WITH LOGIN PASSWORD 'password123'"
+  echo "Role magical_user exists; password ensured"
+fi
+
+# --- Ensure fantasy_worlds DB exists ---
+if [ "$(psql -tAc "SELECT 1 FROM pg_database WHERE datname='fantasy_worlds'")" != "1" ]; then
+  psql -c "CREATE DATABASE fantasy_worlds OWNER magical_user"
+  echo "Created database fantasy_worlds"
+else
+  psql -c "ALTER DATABASE fantasy_worlds OWNER TO magical_user" >/dev/null 2>&1 || true
+  echo "Database fantasy_worlds exists"
+fi
+
+# --- Ensure fantasy_worlds_test DB exists ---
+if [ "$(psql -tAc "SELECT 1 FROM pg_database WHERE datname='fantasy_worlds_test'")" != "1" ]; then
+  psql -c "CREATE DATABASE fantasy_worlds_test OWNER magical_user"
+  echo "Created database fantasy_worlds_test"
+else
+  psql -c "ALTER DATABASE fantasy_worlds_test OWNER TO magical_user" >/dev/null 2>&1 || true
+  echo "Database fantasy_worlds_test exists"
+fi
+
+# --- Grant schema privileges to magical_user in both DBs ---
+for db in fantasy_worlds fantasy_worlds_test; do
+  psql -d "$db" -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC;" >/dev/null 2>&1 || true
+  psql -d "$db" -c "GRANT USAGE, CREATE ON SCHEMA public TO magical_user;"
+  psql -d "$db" -c "ALTER SCHEMA public OWNER TO magical_user;" >/dev/null 2>&1 || true
+done
+
+clear
