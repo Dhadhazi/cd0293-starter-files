@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import bookRoutes from "./handlers/book";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(express.json());
 

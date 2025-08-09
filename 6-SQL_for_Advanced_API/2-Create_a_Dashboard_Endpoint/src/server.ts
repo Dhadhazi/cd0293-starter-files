@@ -3,7 +3,7 @@ import bookRoutes from "./handlers/books";
 import orderRoutes from "./handlers/orders";
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(express.json());
 
