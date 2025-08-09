@@ -1,4 +1,4 @@
-import { Book, BookStore } from "../book";
+import { BookStore } from "../book";
 
 const store = new BookStore();
 
@@ -38,7 +38,6 @@ describe("Book Model", () => {
   });
 
   it("index method should return a list of books", async () => {
-    // First create a book to ensure we have data to return
     await store.create({
       id: 1,
       title: "Test Book for Index",
@@ -56,7 +55,6 @@ describe("Book Model", () => {
   });
 
   it("show method should return the correct book", async () => {
-    // First create a book to ensure we have something to show
     const created = await store.create({
       id: 1,
       title: "Test Book",
@@ -70,7 +68,6 @@ describe("Book Model", () => {
   });
 
   it("delete method should remove the book", async () => {
-    // First create a book to delete
     const created = await store.create({
       id: 1,
       title: "Book to Delete",
